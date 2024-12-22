@@ -2,11 +2,11 @@ FROM node:20-slim
 
 WORKDIR /app
 
-ENV PATH /app/node_modules/.bin:$PATH
-
 COPY package*.json ./
 
-RUN npm install
+RUN rm -rf node_modules && \
+    npm clean-cache --force && \
+    npm install
 
 COPY . .
 
