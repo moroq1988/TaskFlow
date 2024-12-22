@@ -1,21 +1,59 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import type { Task } from "../types/task";
 
-const title = ref("");
-const description = ref("");
-const dueDate = ref("");
-const priority = ref("medium");
-const tags = ref<string[]>([]);
+const title = ref<Task["title"]>("");
+const description = ref<Task["description"]>("");
+const dueDate = ref<Task["dueDate"]>("");
+const priority = ref<Task["priority"]>("medium");
+const tags = ref<Task["tags"]>([]);
 
 const priorities = [
   { value: "low", label: "低", color: "info" },
   { value: "medium", label: "中", color: "warning" },
   { value: "high", label: "高", color: "error" },
 ];
+
+/** タスクを作成する */
+const createTask = async () => {
+  try {
+    const response = await fetch("http://localhost:8000/api/tasks/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: title.value,
+        description: description.value,
+        dueDate: dueDate.value,
+        priority: priority.value,
+        tags: tags.value,
+        status: "todo" as Task["status"],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("タスクの作成に失敗しました");
+    }
+
+    // フォームをリセット
+    title.value = "";
+    description.value = "";
+    dueDate.value = "";
+    priority.value = "medium";
+    tags.value = [];
+
+    // 成功メッセージを表示（後でVuetifyのスナックバーなどで実装）
+    console.log("タスクが作成されました");
+  } catch (error) {
+    console.error("エラー:", error);
+    // エラーメッセージを表示（後でVuetifyのスナックバーなどで実装）
+  }
+};
 </script>
 
 <template>
-  <v-form @submit.prevent>
+  <v-form @submit.prevent="createTask">
     <v-text-field
       v-model="title"
       label="タスク名"
