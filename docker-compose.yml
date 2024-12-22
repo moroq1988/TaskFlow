@@ -1,25 +1,16 @@
 services:
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    build: ./frontend
     volumes:
       - ./frontend:/app
       - /app/node_modules
     ports:
       - "5173:5173"
-    environment:
-      - VITE_API_URL=http://localhost:8000
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    build: ./backend
     volumes:
       - ./backend:/app
     ports:
       - "8000:8000"
-    environment:
-      - DEBUG=1
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
-      - CORS_ALLOWED_ORIGINS=http://localhost:5173
+    command: python manage.py runserver 0.0.0.0:8000
