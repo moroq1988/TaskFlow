@@ -27,4 +27,4 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": "warn",
     semi: ["error", "always"],
   },
-}
+};
