@@ -32,13 +32,16 @@
 ### 起動手順
 
 1. リポジトリのクローン
+
    git clone https://github.com/moroq1988/TaskFlow.git
    cd TaskFlow
 
 2. コンテナの構築と起動
+
    docker compose up -d --build
 
 3. データベースのマイグレーション
+
    docker compose exec backend python manage.py migrate
 
 4. アプリケーションへのアクセス
