@@ -148,7 +148,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     # アクセストークンの有効期限（1時間）
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    # リ��レッシュトークンの有効期限（1日）
+    # リフレッシュトークンの有効期限（1日）
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     # リフレッシュトークン使用時に新しいリフレッシュトークンを発行するか
     'ROTATE_REFRESH_TOKENS': False,
