@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import AppSnackbar from "./AppSnackbar.vue";
 import type { Task } from "../types/task";
+import type { VForm } from "vuetify/components";
 
 const title = ref<Task["title"]>("");
 const description = ref<Task["description"]>("");
@@ -14,6 +16,11 @@ const priorities = [
   { value: "high", label: "高", color: "error" },
 ];
 
+const snackbar = ref(false);
+const snackbarText = ref("");
+const snackbarColor = ref("");
+const form = ref<VForm | null>(null);
+
 /** タスクを作成する */
 const createTask = async () => {
   try {
@@ -25,7 +32,7 @@ const createTask = async () => {
       body: JSON.stringify({
         title: title.value,
         description: description.value,
-        dueDate: dueDate.value,
+        due_date: dueDate.value,
         priority: priority.value,
         tags: tags.value,
         status: "todo" as Task["status"],
@@ -36,24 +43,28 @@ const createTask = async () => {
       throw new Error("タスクの作成に失敗しました");
     }
 
-    // フォームをリセット
+    // フォームとバリデーションをリセット
+    form.value?.reset();
     title.value = "";
     description.value = "";
     dueDate.value = "";
     priority.value = "medium";
     tags.value = [];
 
-    // 成功メッセージを表示（後でVuetifyのスナックバーなどで実装）
-    console.log("タスクが作成されました");
+    snackbarText.value = "タスクが作成されました";
+    snackbarColor.value = "success";
+    snackbar.value = true;
   } catch (error) {
-    console.error("エラー:", error);
-    // エラーメッセージを表示（後でVuetifyのスナックバーなどで実装）
+    // エラー時のスナックバー表示
+    snackbarText.value = "エラーが発生しました";
+    snackbarColor.value = "error";
+    snackbar.value = true;
   }
 };
 </script>
 
 <template>
-  <v-form @submit.prevent="createTask">
+  <v-form ref="form" @submit.prevent="createTask">
     <v-text-field
       v-model="title"
       label="タスク名"
@@ -85,6 +96,8 @@ const createTask = async () => {
 
     <v-combobox v-model="tags" label="タグ" multiple chips small-chips />
 
-    <v-btn color="primary" block class="mt-4" type="submit"> タスクを追加 </v-btn>
+    <v-btn color="primary" block class="mt-4" type="submit">タスクを追加</v-btn>
   </v-form>
+
+  <AppSnackbar v-model="snackbar" :text="snackbarText" :color="snackbarColor" />
 </template>
