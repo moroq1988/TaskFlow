@@ -34,6 +34,7 @@
 1. リポジトリのクローン
 
    git clone https://github.com/moroq1988/TaskFlow.git
+
    cd TaskFlow
 
 2. コンテナの構築と起動
@@ -49,7 +50,7 @@
 - フロントエンド: http://localhost:5173
 - バックエンド: http://localhost:8000
 
-ログインユーザー情報:
+## ログインユーザー情報
 
 - Username: testuser
 - Password: testpass123
