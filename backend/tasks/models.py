@@ -1,34 +1,40 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class Task(models.Model):
-    class Priority(models.TextChoices):
-        LOW = "low", "低"
-        MEDIUM = "medium", "中"
-        HIGH = "high", "高"
-
-    class Status(models.TextChoices):
-        TODO = "todo", "未着手"
-        IN_PROGRESS = "in_progress", "進行中"
-        DONE = "done", "完了"
-
-    title = models.CharField("タイトル", max_length=200)
-    description = models.TextField("説明", blank=True)
-    due_date = models.DateField("期限日", null=True, blank=True)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='tasks',
+        null=True,
+        blank=True
+    )
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    due_date = models.DateField(null=True, blank=True)
     priority = models.CharField(
-        "優先度",
         max_length=10,
-        choices=Priority.choices,
-        default=Priority.MEDIUM
+        choices=[
+            ('low', 'Low'),
+            ('medium', 'Medium'),
+            ('high', 'High'),
+        ],
+        default='medium'
     )
     status = models.CharField(
-        "ステータス",
         max_length=20,
-        choices=Status.choices,
-        default=Status.TODO
+        choices=[
+            ('todo', 'Todo'),
+            ('in_progress', 'In Progress'),
+            ('done', 'Done'),
+        ],
+        default='todo'
     )
-    tags = models.JSONField("タグ", default=list, blank=True)
-    created_at = models.DateTimeField("作成日時", auto_now_add=True)
-    updated_at = models.DateTimeField("更新日時", auto_now=True)
+    tags = models.JSONField(default=list, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "タスク"

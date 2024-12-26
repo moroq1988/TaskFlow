@@ -3,6 +3,9 @@ import { ref } from "vue";
 import AppSnackbar from "./AppSnackbar.vue";
 import type { Task } from "../types/task";
 import type { VForm } from "vuetify/components";
+import { useAuthStore } from "@/stores/auth";
+
+const authStore = useAuthStore();
 
 const title = ref<Task["title"]>("");
 const description = ref<Task["description"]>("");
@@ -28,6 +31,7 @@ const createTask = async () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${authStore.token}`,
       },
       body: JSON.stringify({
         title: title.value,
@@ -40,6 +44,12 @@ const createTask = async () => {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        snackbarText.value = "認証エラーが発生しました。再度ログインしてください。";
+        snackbarColor.value = "error";
+        snackbar.value = true;
+        return;
+      }
       throw new Error("タスクの作成に失敗しました");
     }
 
@@ -59,6 +69,7 @@ const createTask = async () => {
     snackbarText.value = "エラーが発生しました";
     snackbarColor.value = "error";
     snackbar.value = true;
+    console.error("エラー詳細:", error);
   }
 };
 </script>

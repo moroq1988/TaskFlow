@@ -3,8 +3,10 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import type { Task } from "../types/task";
 import AppSnackbar from "./AppSnackbar.vue";
+import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
+const authStore = useAuthStore();
 const tasks = ref<Task[]>([]);
 const dialog = ref(false);
 const taskToDelete = ref<number | null>(null);
@@ -13,13 +15,22 @@ const snackbarMessage = ref("");
 
 const fetchTasks = async () => {
   try {
-    const response = await fetch("http://localhost:8000/api/tasks/");
+    const response = await fetch("http://localhost:8000/api/tasks/", {
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+        "Content-Type": "application/json",
+      },
+    });
     if (!response.ok) {
       throw new Error("タスクの取得に失敗しました");
     }
-    tasks.value = await response.json();
+    const data = await response.json();
+    tasks.value = data;
   } catch (error) {
     console.error("エラー:", error);
+    if (error instanceof Response && error.status === 401) {
+      router.push("/login");
+    }
   }
 };
 
@@ -41,6 +52,10 @@ const handleDelete = async () => {
       `http://localhost:8000/api/tasks/${taskToDelete.value}/`,
       {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${authStore.token}`,
+          "Content-Type": "application/json",
+        },
       }
     );
     if (!response.ok) {
@@ -62,7 +77,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <v-list>
+    <v-list v-if="tasks.length > 0">
       <v-list-item
         v-for="task in tasks"
         :key="task.id"
@@ -94,7 +109,24 @@ onMounted(() => {
       </v-list-item>
     </v-list>
 
-    <!-- 削除確認ダイアログ -->
+    <v-card v-else class="mt-4 pa-4">
+      <v-card-text class="text-center">
+        <v-icon
+          icon="mdi-clipboard-text-outline"
+          size="48"
+          color="grey"
+          class="mb-2"
+        />
+        <div class="text-h6 text-grey">タスクがありません</div>
+        <div class="text-body-2 text-grey-darken-1">
+          新しいタスクを作成してみましょう
+        </div>
+        <v-btn color="primary" class="mt-4" @click="router.push('/create')">
+          タスクを作成
+        </v-btn>
+      </v-card-text>
+    </v-card>
+
     <v-dialog v-model="dialog" max-width="400">
       <v-card>
         <v-card-title class="text-h5"> 確認 </v-card-title>
@@ -109,7 +141,6 @@ onMounted(() => {
       </v-card>
     </v-dialog>
 
-    <!-- スナックバー -->
     <AppSnackbar v-model="snackbar" :text="snackbarMessage" color="success" />
   </div>
 </template>

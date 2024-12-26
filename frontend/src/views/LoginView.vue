@@ -10,8 +10,16 @@ const username = ref("");
 const password = ref("");
 const error = ref("");
 const loading = ref(false);
+const formValid = ref(true);
+const usernameRules = [(v: string) => !!v || "ユーザー名は必須です"];
+const passwordRules = [(v: string) => !!v || "パスワードは必須です"];
 
 const handleLogin = async () => {
+  if (!username.value || !password.value) {
+    error.value = "ユーザー名とパスワードを入力してください";
+    return;
+  }
+
   try {
     loading.value = true;
     error.value = "";
@@ -43,11 +51,12 @@ const handleLogin = async () => {
       <v-col cols="12" sm="8" md="6" lg="4">
         <v-card class="elevation-12">
           <v-card-title class="text-h5 text-center pt-6">ログイン</v-card-title>
-          <v-form class="pa-4" @submit.prevent="handleLogin">
+          <v-form v-model="formValid" class="pa-4" @submit.prevent="handleLogin">
             <v-text-field
               v-model="username"
               label="ユーザー名"
               prepend-icon="mdi-account"
+              :rules="usernameRules"
               required
             />
             <v-text-field
@@ -55,9 +64,16 @@ const handleLogin = async () => {
               label="パスワード"
               :type="'password'"
               prepend-icon="mdi-lock"
+              :rules="passwordRules"
               required
             />
-            <v-btn color="primary" type="submit" block class="mt-4">
+            <v-btn
+              color="primary"
+              type="submit"
+              block
+              class="mt-4"
+              :disabled="!formValid"
+            >
               ログイン
             </v-btn>
           </v-form>
