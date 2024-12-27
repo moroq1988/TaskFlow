@@ -6,6 +6,7 @@ backend/db.sqlite3-journal
 backend/.env
 backend/media/
 backend/static/
+backend/data.json
 
 # frontend
 frontend/node_modules/

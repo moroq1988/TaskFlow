@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: taskflow-backend
+    env: docker
+    rootDir: ./backend
+    dockerfilePath: Dockerfile.prod
+    buildContext: ./backend
+    dockerCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    preDeployCommand: python manage.py migrate && python manage.py create_default_user
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: .onrender.com
