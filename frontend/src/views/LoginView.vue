@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from "@/api/client";
 import { useAuthStore } from "@/stores/auth";
+import axios from "axios";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -24,7 +25,7 @@ const handleLogin = async () => {
     loading.value = true;
     error.value = "";
 
-    const response = await axios.post("http://localhost:8000/api/accounts/login/", {
+    const response = await apiClient.post("/api/accounts/login/", {
       username: username.value,
       password: password.value,
     });

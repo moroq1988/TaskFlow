@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import type { Task } from "../types/task";
 import AppSnackbar from "./AppSnackbar.vue";
 import { useAuthStore } from "@/stores/auth";
+import apiClient from "@/api/client";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -15,17 +16,8 @@ const snackbarMessage = ref("");
 
 const fetchTasks = async () => {
   try {
-    const response = await fetch("http://localhost:8000/api/tasks/", {
-      headers: {
-        Authorization: `Bearer ${authStore.token}`,
-        "Content-Type": "application/json",
-      },
-    });
-    if (!response.ok) {
-      throw new Error("タスクの取得に失敗しました");
-    }
-    const data = await response.json();
-    tasks.value = data;
+    const response = await apiClient.get("/api/tasks/");
+    tasks.value = response.data;
   } catch (error) {
     console.error("エラー:", error);
     if (error instanceof Response && error.status === 401) {
