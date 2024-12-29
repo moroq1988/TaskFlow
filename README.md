@@ -38,30 +38,23 @@
    cd TaskFlow
    ```
 
-2. 環境変数の設定
-
-   ```bash
-   cd frontend
-   cp .env.example .env
-   ```
-
-3. Docker Desktop のインストール
+2. Docker Desktop のインストール
 
 https://www.docker.com/ja-jp/products/docker-desktop/
 
-4. コンテナの構築（ビルド）と起動
+3. コンテナの構築（ビルド）と起動
 
    ```bash
    docker compose up -d --build
    ```
 
-5. データベースのマイグレーション
+4. データベースのマイグレーション
 
    ```bash
    docker compose exec backend python manage.py migrate
    ```
 
-6. アプリケーションへのアクセス
+5. アプリケーションへのアクセス
 
 - フロントエンド: http://localhost:5173
 - バックエンド: http://localhost:8000

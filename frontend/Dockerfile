@@ -2,6 +2,8 @@ FROM node:20-slim
 
 WORKDIR /app
 
+COPY .env.example .env
+
 COPY package*.json ./
 
 RUN rm -rf node_modules && \
