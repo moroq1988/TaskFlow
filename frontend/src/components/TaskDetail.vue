@@ -2,13 +2,11 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { Task } from "../types/task";
-import { useAuthStore } from "@/stores/auth";
 import apiClient from "@/api/client";
 import axios from "axios";
 
 const route = useRoute();
 const router = useRouter();
-const authStore = useAuthStore();
 const task = ref<Task | null>(null);
 
 const fetchTask = async () => {
@@ -21,7 +19,10 @@ const fetchTask = async () => {
         console.error("認証エラー");
         return;
       }
-      console.error("エラー:", e.response?.data?.error || "タスクの取得に失敗しました");
+      console.error(
+        "エラー:",
+        e.response?.data?.error || "タスクの取得に失敗しました"
+      );
     } else {
       console.error("予期せぬエラーが発生しました");
     }

@@ -3,11 +3,8 @@ import { ref } from "vue";
 import AppSnackbar from "./AppSnackbar.vue";
 import type { Task } from "../types/task";
 import type { VForm } from "vuetify/components";
-import { useAuthStore } from "@/stores/auth";
 import apiClient from "@/api/client";
 import axios from "axios";
-
-const authStore = useAuthStore();
 
 const title = ref<Task["title"]>("");
 const description = ref<Task["description"]>("");
@@ -29,7 +26,7 @@ const form = ref<VForm | null>(null);
 /** タスクを作成する */
 const createTask = async () => {
   try {
-    const response = await apiClient.post("/tasks/", {
+    wait apiClient.post("/tasks/", {
       title: title.value,
       description: description.value,
       due_date: dueDate.value,

@@ -3,12 +3,10 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import type { Task } from "../types/task";
 import AppSnackbar from "./AppSnackbar.vue";
-import { useAuthStore } from "@/stores/auth";
 import apiClient from "@/api/client";
 import axios from "axios";
 
 const router = useRouter();
-const authStore = useAuthStore();
 const tasks = ref<Task[]>([]);
 const dialog = ref(false);
 const taskToDelete = ref<number | null>(null);
@@ -43,14 +41,15 @@ const handleDelete = async () => {
   try {
     const response = await apiClient.delete(`/tasks/${taskToDelete.value}/`);
     console.log("タスク削除成功:", response.data);
-    
+
     await fetchTasks();
     dialog.value = false;
     snackbarMessage.value = "タスクの削除が完了しました";
     snackbar.value = true;
   } catch (e: unknown) {
     if (axios.isAxiosError(e)) {
-      snackbarMessage.value = e.response?.data?.error || "タスクの削除に失敗しました";
+      snackbarMessage.value =
+        e.response?.data?.error || "タスクの削除に失敗しました";
     } else {
       snackbarMessage.value = "予期せぬエラーが発生しました";
     }
