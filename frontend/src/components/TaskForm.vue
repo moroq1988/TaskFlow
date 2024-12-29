@@ -26,7 +26,7 @@ const form = ref<VForm | null>(null);
 /** タスクを作成する */
 const createTask = async () => {
   try {
-    wait apiClient.post("/tasks/", {
+    await apiClient.post("/tasks/", {
       title: title.value,
       description: description.value,
       due_date: dueDate.value,
