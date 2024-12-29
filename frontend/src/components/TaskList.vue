@@ -5,6 +5,7 @@ import type { Task } from "../types/task";
 import AppSnackbar from "./AppSnackbar.vue";
 import { useAuthStore } from "@/stores/auth";
 import apiClient from "@/api/client";
+import axios from "axios";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -16,7 +17,7 @@ const snackbarMessage = ref("");
 
 const fetchTasks = async () => {
   try {
-    const response = await apiClient.get("/api/tasks/");
+    const response = await apiClient.get("/tasks/");
     tasks.value = response.data;
   } catch (error) {
     console.error("エラー:", error);
@@ -40,25 +41,21 @@ const handleDelete = async () => {
   if (!taskToDelete.value) return;
 
   try {
-    const response = await fetch(
-      `http://localhost:8000/api/tasks/${taskToDelete.value}/`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${authStore.token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    if (!response.ok) {
-      throw new Error("タスクの削除に失敗しました");
-    }
+    const response = await apiClient.delete(`/tasks/${taskToDelete.value}/`);
+    console.log("タスク削除成功:", response.data);
+    
     await fetchTasks();
     dialog.value = false;
     snackbarMessage.value = "タスクの削除が完了しました";
     snackbar.value = true;
-  } catch (error) {
-    console.error("エラー:", error);
+  } catch (e: unknown) {
+    if (axios.isAxiosError(e)) {
+      snackbarMessage.value = e.response?.data?.error || "タスクの削除に失敗しました";
+    } else {
+      snackbarMessage.value = "予期せぬエラーが発生しました";
+    }
+    snackbar.value = true;
+    console.error("タスク削除エラー:", e);
   }
 };
 

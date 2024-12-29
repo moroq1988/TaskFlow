@@ -3,6 +3,8 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { Task } from "../types/task";
 import { useAuthStore } from "@/stores/auth";
+import apiClient from "@/api/client";
+import axios from "axios";
 
 const route = useRoute();
 const router = useRouter();
@@ -11,27 +13,18 @@ const task = ref<Task | null>(null);
 
 const fetchTask = async () => {
   try {
-    const response = await fetch(
-      `http://localhost:8000/api/tasks/${route.params.id}/`,
-      {
-        headers: {
-          Authorization: `Bearer ${authStore.token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      if (response.status === 401) {
+    const response = await apiClient.get(`/tasks/${route.params.id}/`);
+    task.value = response.data;
+  } catch (e: unknown) {
+    if (axios.isAxiosError(e)) {
+      if (e.response?.status === 401) {
         console.error("認証エラー");
         return;
       }
-      throw new Error("タスクの取得に失敗しました");
+      console.error("エラー:", e.response?.data?.error || "タスクの取得に失敗しました");
+    } else {
+      console.error("予期せぬエラーが発生しました");
     }
-
-    task.value = await response.json();
-  } catch (error) {
-    console.error("エラー:", error);
   }
 };
 

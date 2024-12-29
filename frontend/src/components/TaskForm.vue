@@ -4,6 +4,8 @@ import AppSnackbar from "./AppSnackbar.vue";
 import type { Task } from "../types/task";
 import type { VForm } from "vuetify/components";
 import { useAuthStore } from "@/stores/auth";
+import apiClient from "@/api/client";
+import axios from "axios";
 
 const authStore = useAuthStore();
 
@@ -27,31 +29,14 @@ const form = ref<VForm | null>(null);
 /** タスクを作成する */
 const createTask = async () => {
   try {
-    const response = await fetch("http://localhost:8000/api/tasks/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authStore.token}`,
-      },
-      body: JSON.stringify({
-        title: title.value,
-        description: description.value,
-        due_date: dueDate.value,
-        priority: priority.value,
-        tags: tags.value,
-        status: "todo" as Task["status"],
-      }),
+    const response = await apiClient.post("/tasks/", {
+      title: title.value,
+      description: description.value,
+      due_date: dueDate.value,
+      priority: priority.value,
+      tags: tags.value,
+      status: "todo" as Task["status"],
     });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        snackbarText.value = "認証エラーが発生しました。再度ログインしてください。";
-        snackbarColor.value = "error";
-        snackbar.value = true;
-        return;
-      }
-      throw new Error("タスクの作成に失敗しました");
-    }
 
     // フォームとバリデーションをリセット
     form.value?.reset();
@@ -64,12 +49,15 @@ const createTask = async () => {
     snackbarText.value = "タスクが作成されました";
     snackbarColor.value = "success";
     snackbar.value = true;
-  } catch (error) {
-    // エラー時のスナックバー表示
-    snackbarText.value = "エラーが発生しました";
+  } catch (e: unknown) {
+    if (axios.isAxiosError(e)) {
+      snackbarText.value = e.response?.data?.error || "エラーが発生しました";
+    } else {
+      snackbarText.value = "予期せぬエラーが発生しました";
+    }
     snackbarColor.value = "error";
     snackbar.value = true;
-    console.error("エラー詳細:", error);
+    console.error("タスク作成エラー:", e);
   }
 };
 </script>
